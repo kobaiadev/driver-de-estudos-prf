@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ImportarRouteImport } from './routes/importar'
+import { Route as EstudoMateriaIdRouteImport } from './routes/estudo.$materiaId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ImportarRoute = ImportarRouteImport.update({
+  id: '/importar',
+  path: '/importar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EstudoMateriaIdRoute = EstudoMateriaIdRouteImport.update({
+  id: '/estudo/$materiaId',
+  path: '/estudo/$materiaId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/importar': typeof ImportarRoute
+  '/estudo/$materiaId': typeof EstudoMateriaIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/importar': typeof ImportarRoute
+  '/estudo/$materiaId': typeof EstudoMateriaIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/importar': typeof ImportarRoute
+  '/estudo/$materiaId': typeof EstudoMateriaIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/importar' | '/estudo/$materiaId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/importar' | '/estudo/$materiaId'
+  id: '__root__' | '/' | '/importar' | '/estudo/$materiaId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ImportarRoute: typeof ImportarRoute
+  EstudoMateriaIdRoute: typeof EstudoMateriaIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/importar': {
+      id: '/importar'
+      path: '/importar'
+      fullPath: '/importar'
+      preLoaderRoute: typeof ImportarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/estudo/$materiaId': {
+      id: '/estudo/$materiaId'
+      path: '/estudo/$materiaId'
+      fullPath: '/estudo/$materiaId'
+      preLoaderRoute: typeof EstudoMateriaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ImportarRoute: ImportarRoute,
+  EstudoMateriaIdRoute: EstudoMateriaIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
