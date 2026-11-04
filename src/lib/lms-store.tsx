@@ -3,6 +3,8 @@ import { gerarTrilha, MATERIAS } from "./lms-data";
 
 type State = {
   concluidas: string[];
+  concluidasEm: Record<string, string>;
+  horasSemana: number;
   segundosPorMateria: Record<string, number>;
   simulados: number;
   trilha: ReturnType<typeof gerarTrilha> | null;
@@ -11,6 +13,8 @@ type State = {
 };
 const initial: State = {
   concluidas: [],
+  concluidasEm: {},
+  horasSemana: 20,
   segundosPorMateria: {},
   simulados: 0,
   trilha: gerarTrilha(MATERIAS),
@@ -25,6 +29,7 @@ type Ctx = State & {
   setTrilha: (t: State["trilha"]) => void;
   sincronizar: () => void;
   toggleDark: () => void;
+  setHorasSemana: (h: number) => void;
 };
 const C = createContext<Ctx | null>(null);
 
@@ -42,7 +47,13 @@ export function LmsProvider({ children }: { children: ReactNode }) {
 
   const v: Ctx = {
     ...s,
-    toggleAula: (id) => setS((p) => ({ ...p, concluidas: p.concluidas.includes(id) ? p.concluidas.filter((x) => x !== id) : [...p.concluidas, id] })),
+    toggleAula: (id) => setS((p) => {
+      const em = { ...p.concluidasEm };
+      if (p.concluidas.includes(id)) { delete em[id]; return { ...p, concluidas: p.concluidas.filter((x) => x !== id), concluidasEm: em }; }
+      em[id] = new Date().toISOString();
+      return { ...p, concluidas: [...p.concluidas, id], concluidasEm: em };
+    }),
+    setHorasSemana: (h) => setS((p) => ({ ...p, horasSemana: h })),
     addTempo: (m, sec) => setS((p) => ({ ...p, segundosPorMateria: { ...p.segundosPorMateria, [m]: (p.segundosPorMateria[m] ?? 0) + sec } })),
     setTrilha: (t) => setS((p) => ({ ...p, trilha: t })),
     sincronizar: () => setS((p) => ({ ...p, sincronizadoEm: new Date().toISOString() })),

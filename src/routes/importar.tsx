@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ChevronRight, FileText, Folder, HardDrive, RefreshCw, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronRight, FileText, Folder, HardDrive, RefreshCw, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { gerarTrilha, MATERIAS } from "@/lib/lms-data";
+import { gerarTrilha, MATERIAS, todasAulas } from "@/lib/lms-data";
 import { useLms } from "@/lib/lms-store";
 import { listarDrive, type DriveItem, PASTA_RAIZ } from "@/lib/drive.functions";
 
@@ -55,7 +55,7 @@ function DriveRow({ it, depth }: { it: DriveItem; depth: number }) {
 }
 
 function Importar() {
-  const { trilha, setTrilha, sincronizadoEm, sincronizar } = useLms();
+  const { trilha, setTrilha, sincronizadoEm, sincronizar, concluidas, toggleAula } = useLms();
   const qc = useQueryClient();
   const [loading, setLoading] = useState<"sync" | "gen" | null>(null);
   const run = (k: "sync" | "gen", fn: () => void) => { setLoading(k); setTimeout(() => { fn(); setLoading(null); }, 900); };
@@ -85,25 +85,92 @@ function Importar() {
               <Sparkles className="h-4 w-4" /> {loading === "gen" ? "Gerando..." : "Gerar Trilha de Estudos Automatizada"}
             </button>
           </div>
+          <ProgressoTrilha />
           <div className="mt-6 grid gap-4 md:grid-cols-2">
-            {trilha?.map((sem, i) => (
-              <div key={i} className="rounded-lg border bg-card p-4">
-                <div className="mb-2 font-display font-bold">Semana {i + 1}</div>
-                <ul className="space-y-1">
-                  {sem.map((x, j) => (
-                    <li key={j} className="text-sm">
-                      <Link to="/estudo/$materiaId" params={{ materiaId: x.materiaId }} search={{ aula: x.aulaId }} className="hover:text-primary">
-                        <span className="font-semibold">{x.materia}:</span> <span className="text-muted-foreground">{x.aula}</span>
-                        <span className="block text-xs text-muted-foreground/70">{x.modulo}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            {trilha?.map((sem, i) => {
+              const feitas = sem.filter((x) => concluidas.includes(x.aulaId)).length;
+              const pct = Math.round((feitas / sem.length) * 100);
+              return (
+                <div key={i} className={`rounded-lg border bg-card p-4 ${pct === 100 ? "border-success" : ""}`}>
+                  <div className="mb-1 flex items-center justify-between">
+                    <span className="font-display font-bold">Semana {i + 1}</span>
+                    <span className="text-xs font-semibold text-muted-foreground">{feitas}/{sem.length} · {pct}%</span>
+                  </div>
+                  <Barra pct={pct} />
+                  <ul className="mt-3 space-y-1.5">
+                    {sem.map((x) => {
+                      const ok = concluidas.includes(x.aulaId);
+                      return (
+                        <li key={x.aulaId} className="flex items-start gap-2 text-sm">
+                          <input type="checkbox" checked={ok} onChange={() => toggleAula(x.aulaId)} className="mt-1 accent-[var(--primary)]" aria-label={`Concluir ${x.aula}`} />
+                          <Link to="/estudo/$materiaId" params={{ materiaId: x.materiaId }} search={{ aula: x.aulaId }} className={`hover:text-primary ${ok ? "line-through opacity-60" : ""}`}>
+                            <span className="font-semibold">{x.materia}:</span> <span className="text-muted-foreground">{x.aula}</span>
+                            <span className="block text-xs text-muted-foreground/70">{x.modulo}</span>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              );
+            })}
           </div>
         </section>
       </div>
     </AppShell>
+  );
+}
+
+function Barra({ pct, fina }: { pct: number; fina?: boolean }) {
+  return (
+    <div className={`${fina ? "h-1" : "h-1.5"} overflow-hidden rounded-full bg-muted`}>
+      <div className={`h-full ${pct === 100 ? "bg-success" : "bg-primary"}`} style={{ width: `${pct}%` }} />
+    </div>
+  );
+}
+
+function ProgressoTrilha() {
+  const { concluidas } = useLms();
+  const [aberta, setAberta] = useState<string | null>(null);
+  const pc = (ids: string[]) => (ids.length ? Math.round((ids.filter((x) => concluidas.includes(x)).length / ids.length) * 100) : 0);
+  const total = MATERIAS.flatMap((m) => todasAulas(m).map((a) => a.id));
+  return (
+    <div className="mt-6 rounded-lg border bg-card p-4">
+      <div className="mb-1 flex items-center justify-between">
+        <h2 className="font-bold">Progresso por matéria e curso</h2>
+        <span className="text-sm font-semibold">{total.filter((x) => concluidas.includes(x)).length}/{total.length} aulas · {pc(total)}%</span>
+      </div>
+      <Barra pct={pc(total)} />
+      <div className="mt-4 grid gap-x-6 gap-y-2 md:grid-cols-2">
+        {MATERIAS.map((m) => {
+          const ids = todasAulas(m).map((a) => a.id);
+          const p = pc(ids);
+          const open = aberta === m.id;
+          return (
+            <div key={m.id}>
+              <button onClick={() => setAberta(open ? null : m.id)} className="flex w-full items-center gap-2 text-left text-sm">
+                <ChevronDown className={`h-3.5 w-3.5 shrink-0 transition ${open ? "" : "-rotate-90"}`} />
+                <span className="flex-1 truncate font-semibold">{m.nome}</span>
+                <span className="text-xs text-muted-foreground">{ids.filter((x) => concluidas.includes(x)).length}/{ids.length} · {p}%</span>
+              </button>
+              <div className="ml-5 mt-1"><Barra pct={p} fina /></div>
+              {open && (
+                <ul className="ml-5 mt-2 space-y-1.5 border-l pl-3">
+                  {m.modulos.map((mo) => {
+                    const mids = mo.aulas.map((a) => a.id);
+                    return (
+                      <li key={mo.id} className="text-xs">
+                        <div className="flex justify-between gap-2"><span className="truncate">{mo.titulo}</span><span className="shrink-0 text-muted-foreground">{mids.filter((x) => concluidas.includes(x)).length}/{mids.length}</span></div>
+                        <Barra pct={pc(mids)} fina />
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }

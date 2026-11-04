@@ -18,6 +18,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <nav className="ml-4 flex gap-1">
             <Link to="/" className={link} activeOptions={{ exact: true }} activeProps={active}>Painel</Link>
             <Link to="/importar" className={link} activeProps={active}>Drive & Trilha</Link>
+            <Link to="/plano" className={link} activeProps={active}>Plano</Link>
             <Link to="/estudo/$materiaId" params={{ materiaId: "penal" }} className={link} activeProps={active}>Estudar</Link>
           </nav>
           <button onClick={toggleDark} aria-label="Alternar tema" className="ml-auto rounded-md border p-2 hover:bg-secondary">
