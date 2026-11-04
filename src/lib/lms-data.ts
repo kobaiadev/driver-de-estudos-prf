@@ -35,11 +35,11 @@ export const MATERIAS: Materia[] = (catalogo as Raw[]).map((m) => ({
     return {
       id: mo.id,
       titulo: mo.titulo,
-      aulas: mo.aulas.map((a) => ({
+      aulas: [...mo.aulas].sort((x, y) => x.t.localeCompare(y.t, "pt", { numeric: true })).map((a) => ({
         id: a.id,
         titulo: a.t,
         duracao: a.v.length ? a.v.length * 25 : 20 * Math.max(1, a.p.length),
-        videos: a.v.map(([id, t]) => ({ id: id!, titulo: t!, url: prev(id!), abrir: view(id!) })),
+        videos: [...a.v].sort((x, y) => x[1]!.localeCompare(y[1]!, "pt", { numeric: true })).map(([id, t]) => ({ id: id!, titulo: t!, url: prev(id!), abrir: view(id!) })),
         materiais: a.p.map(([id, t]) => ({ id: id!, titulo: t!, tipo: passo ? "passo" : "pdf", url: view(id!) })),
       })),
     };
