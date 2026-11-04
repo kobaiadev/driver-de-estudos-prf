@@ -14,10 +14,10 @@ const initial: State = {
   segundosPorMateria: {},
   simulados: 0,
   trilha: gerarTrilha(MATERIAS),
-  sincronizadoEm: new Date().toISOString(),
+  sincronizadoEm: null,
   dark: false,
 };
-const KEY = "prf-lms-v2";
+const KEY = "prf-lms-v3";
 
 type Ctx = State & {
   toggleAula: (id: string) => void;

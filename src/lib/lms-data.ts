@@ -48,16 +48,21 @@ export const MATERIAS: Materia[] = (catalogo as Raw[]).map((m) => ({
 
 export const todasAulas = (m: Materia) => m.modulos.flatMap((mo) => mo.aulas);
 
-/** Distribui as matérias detectadas em semanas: cada semana recebe até `porSemana` aulas, intercalando disciplinas. */
-export function gerarTrilha(materias: Materia[], porSemana = 8) {
-  const filas = materias.map((m) => todasAulas(m).map((a) => ({ materia: m.nome, materiaId: m.id, aula: a.titulo })));
-  const ordem: { materia: string; materiaId: string; aula: string }[] = [];
+export type ItemTrilha = { materia: string; materiaId: string; modulo: string; aula: string; aulaId: string };
+
+/** Todas as pastas-aula de todas as matérias (incluindo Mentorias, Passo Estratégico, Bizus e Simulados)
+ *  entram na trilha: cada curso vira uma fila e as filas são intercaladas, semana a semana. */
+export function gerarTrilha(materias: Materia[], porSemana = 12) {
+  const filas: ItemTrilha[][] = materias.flatMap((m) =>
+    m.modulos.map((mo) => mo.aulas.map((a) => ({ materia: m.nome, materiaId: m.id, modulo: mo.titulo, aula: a.titulo, aulaId: a.id }))),
+  );
+  const ordem: ItemTrilha[] = [];
   let resta = true;
   while (resta) {
     resta = false;
     for (const f of filas) { const x = f.shift(); if (x) { ordem.push(x); resta = true; } }
   }
-  const semanas: (typeof ordem)[] = [];
+  const semanas: ItemTrilha[][] = [];
   for (let i = 0; i < ordem.length; i += porSemana) semanas.push(ordem.slice(i, i + porSemana));
   return semanas;
 }

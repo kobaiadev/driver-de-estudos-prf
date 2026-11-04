@@ -6,6 +6,7 @@ import { MATERIAS, todasAulas } from "@/lib/lms-data";
 import { fmtHoras, useLms } from "@/lib/lms-store";
 
 export const Route = createFileRoute("/estudo/$materiaId")({
+  validateSearch: (s: Record<string, unknown>): { aula?: string } => (typeof s["aula"] === "string" ? { aula: s["aula"] } : {}),
   loader: ({ params }) => {
     const m = MATERIAS.find((x) => x.id === params.materiaId);
     if (!m) throw notFound();
@@ -29,10 +30,12 @@ function Estudo() {
   const materia = MATERIAS.find((m) => m.id === materiaId)!;
   const { concluidas, toggleAula } = useLms();
   const aulas = todasAulas(materia);
-  const [aulaId, setAulaId] = useState(aulas[0]!.id);
-  useEffect(() => setAulaId(aulas[0]!.id), [materiaId]);
+  const { aula: aulaBusca } = Route.useSearch();
+  const inicial = aulas.some((a) => a.id === aulaBusca) ? aulaBusca! : aulas[0]!.id;
+  const [aulaId, setAulaId] = useState(inicial);
+  useEffect(() => setAulaId(inicial), [materiaId, aulaBusca]);
   const aula = aulas.find((a) => a.id === aulaId) ?? aulas[0]!;
-  const [abertos, setAbertos] = useState<string[]>([materia.modulos[0]!.id]);
+  const [abertos, setAbertos] = useState<string[]>([(materia.modulos.find((mo) => mo.aulas.some((x) => x.id === inicial)) ?? materia.modulos[0]!).id]);
   const [vidIdx, setVidIdx] = useState(0);
   useEffect(() => setVidIdx(0), [aulaId]);
   const video = aula.videos[vidIdx] ?? aula.videos[0];

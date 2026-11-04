@@ -79,7 +79,7 @@ function Importar() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h1 className="text-2xl font-black">Trilha de estudos semanal</h1>
-              <p className="text-sm text-muted-foreground">{MATERIAS.length} matérias detectadas, aulas intercaladas por disciplina.</p>
+              <p className="text-sm text-muted-foreground">{MATERIAS.length} matérias · {trilha?.reduce((n, s) => n + s.length, 0) ?? 0} aulas (todas as pastas do Drive, incluindo mentorias, Passo Estratégico, bizus e simulados) · {trilha?.length ?? 0} semanas</p>
             </div>
             <button disabled={!!loading} onClick={() => run("gen", () => setTrilha(gerarTrilha(MATERIAS)))} className={`${btn} bg-accent text-accent-foreground hover:opacity-90`}>
               <Sparkles className="h-4 w-4" /> {loading === "gen" ? "Gerando..." : "Gerar Trilha de Estudos Automatizada"}
@@ -92,8 +92,9 @@ function Importar() {
                 <ul className="space-y-1">
                   {sem.map((x, j) => (
                     <li key={j} className="text-sm">
-                      <Link to="/estudo/$materiaId" params={{ materiaId: x.materiaId }} className="hover:text-primary">
+                      <Link to="/estudo/$materiaId" params={{ materiaId: x.materiaId }} search={{ aula: x.aulaId }} className="hover:text-primary">
                         <span className="font-semibold">{x.materia}:</span> <span className="text-muted-foreground">{x.aula}</span>
+                        <span className="block text-xs text-muted-foreground/70">{x.modulo}</span>
                       </Link>
                     </li>
                   ))}
