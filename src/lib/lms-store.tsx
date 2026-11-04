@@ -10,14 +10,14 @@ type State = {
   dark: boolean;
 };
 const initial: State = {
-  concluidas: ["penal-m1-a1", "penal-m1-a2", "transito-m1-a1", "informatica-m1-a1", "rlm-m1-a1"],
-  segundosPorMateria: { penal: 3 * 3600, transito: 2 * 3600 + 1500, informatica: 5400, rlm: 3000 },
-  simulados: 2,
+  concluidas: [],
+  segundosPorMateria: {},
+  simulados: 0,
   trilha: gerarTrilha(MATERIAS),
   sincronizadoEm: new Date().toISOString(),
   dark: false,
 };
-const KEY = "prf-lms-v1";
+const KEY = "prf-lms-v2";
 
 type Ctx = State & {
   toggleAula: (id: string) => void;

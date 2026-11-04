@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { CheckCircle2, ChevronDown, Circle, FileText, Pause, Play, RotateCcw, Target } from "lucide-react";
+import { CheckCircle2, ChevronDown, Circle, ExternalLink, FileText, PlayCircle, Pause, Play, RotateCcw, Target } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { MATERIAS, todasAulas } from "@/lib/lms-data";
@@ -32,7 +32,10 @@ function Estudo() {
   const [aulaId, setAulaId] = useState(aulas[0]!.id);
   useEffect(() => setAulaId(aulas[0]!.id), [materiaId]);
   const aula = aulas.find((a) => a.id === aulaId) ?? aulas[0]!;
-  const [abertos, setAbertos] = useState<string[]>(materia.modulos.map((m) => m.id));
+  const [abertos, setAbertos] = useState<string[]>([materia.modulos[0]!.id]);
+  const [vidIdx, setVidIdx] = useState(0);
+  useEffect(() => setVidIdx(0), [aulaId]);
+  const video = aula.videos[vidIdx] ?? aula.videos[0];
   const feita = concluidas.includes(aula.id);
 
   return (
@@ -65,11 +68,28 @@ function Estudo() {
 
         <section className="space-y-4">
           <div className="aspect-video overflow-hidden rounded-lg border bg-muted">
-            <iframe key={aula.id} src={aula.videoUrl} title={aula.titulo} className="h-full w-full" allowFullScreen />
+            {video ? (
+              <iframe key={video.id} src={video.url} title={video.titulo} className="h-full w-full" allow="autoplay" allowFullScreen />
+            ) : (
+              <div className="grid h-full place-items-center p-6 text-center text-sm text-muted-foreground">
+                Esta aula não tem vídeo — estude pelos PDFs abaixo.
+              </div>
+            )}
           </div>
+          {aula.videos.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {aula.videos.map((v, i) => (
+                <button key={v.id} onClick={() => setVidIdx(i)}
+                  className={`inline-flex max-w-full items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs ${i === vidIdx ? "border-primary bg-primary text-primary-foreground" : "bg-card hover:border-primary"}`}>
+                  <PlayCircle className="h-3.5 w-3.5 shrink-0" /><span className="truncate">{v.titulo}</span>
+                </button>
+              ))}
+              {video && <a href={video.abrir} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 px-2 py-1.5 text-xs text-muted-foreground hover:text-primary">Abrir no Drive <ExternalLink className="h-3 w-3" /></a>}
+            </div>
+          )}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-xs uppercase tracking-wider text-muted-foreground">{materia.pasta}</p>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">{materia.modulos.find((mo) => mo.aulas.some((x) => x.id === aula.id))?.titulo}</p>
               <h1 className="text-2xl font-black">{aula.titulo}</h1>
             </div>
             <button onClick={() => toggleAula(aula.id)}
@@ -80,7 +100,7 @@ function Estudo() {
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {aula.materiais.map((m) => (
-              <div key={m.id} className="rounded-lg border bg-card p-4">
+              <a key={m.id} href={m.url} target="_blank" rel="noreferrer" className="block rounded-lg border bg-card p-4 transition hover:border-primary">
                 <div className="flex items-center gap-2 text-sm font-semibold">
                   {m.tipo === "passo" ? <Target className="h-4 w-4 text-accent" /> : <FileText className="h-4 w-4 text-primary" />}
                   {m.titulo}
@@ -88,9 +108,9 @@ function Estudo() {
                 <p className="mt-2 text-xs text-muted-foreground">
                   {m.tipo === "passo"
                     ? "Pontos mais cobrados pela banca, revisão e questões-chave para esta aula."
-                    : "Material teórico completo em PDF, vinculado à pasta do Drive."}
+                    : "Material em PDF da sua pasta do Drive — clique para abrir."}
                 </p>
-              </div>
+              </a>
             ))}
           </div>
           <Link to="/" className="inline-block text-sm text-muted-foreground hover:text-foreground">← Voltar ao painel</Link>

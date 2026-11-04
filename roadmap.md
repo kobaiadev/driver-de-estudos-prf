@@ -1,1 +1,3 @@
 - [x] Mostrar só a pasta de estudos do Drive (1yDimyasj-FZb6EbJwXNQNW1XLChRR8Si)
+- [x] Preencher página inicial com dados reais do Drive, separados por matéria
+- [x] Vincular vídeos e PDFs do Drive às aulas da trilha e da tela Estudar
