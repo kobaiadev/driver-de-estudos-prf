@@ -44,7 +44,7 @@ function Estudo() {
   return (
     <AppShell>
       <div className="mx-auto grid max-w-[1400px] grid-cols-[minmax(0,1fr)] gap-4 px-3 py-6 sm:px-4 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)_280px]">
-        <aside className="rounded-lg border bg-sidebar p-3 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-auto">
+        <aside className="order-2 rounded-lg border bg-sidebar p-3 lg:order-1 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-auto">
           <select value={materiaId} onChange={(e) => (window.location.href = `/estudo/${e.target.value}`)}
             className="mb-3 w-full rounded-md border bg-card px-2 py-1.5 text-sm font-semibold">
             {MATERIAS.map((m) => <option key={m.id} value={m.id}>{m.nome}</option>)}
@@ -69,7 +69,7 @@ function Estudo() {
           })}
         </aside>
 
-        <section className="space-y-4">
+        <section className="order-1 space-y-4 lg:order-2">
           <div className="aspect-video overflow-hidden rounded-lg border bg-muted">
             {video ? (
               <iframe key={video.id} src={video.url} title={video.titulo} className="h-full w-full" allow="autoplay" allowFullScreen />
@@ -119,7 +119,7 @@ function Estudo() {
           <Link to="/" className="inline-block text-sm text-muted-foreground hover:text-foreground">← Voltar ao painel</Link>
         </section>
 
-        <aside className="lg:col-span-2 xl:col-span-1 xl:sticky xl:top-20 xl:self-start"><Pomodoro materiaId={materia.id} nome={materia.nome} /></aside>
+        <aside className="order-3 lg:col-span-2 xl:col-span-1 xl:sticky xl:top-20 xl:self-start"><Pomodoro materiaId={materia.id} nome={materia.nome} /></aside>
       </div>
     </AppShell>
   );
