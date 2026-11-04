@@ -1,10 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { Moon, Shield, Sun } from "lucide-react";
+import { LogOut, Moon, Shield, Sun } from "lucide-react";
 import type { ReactNode } from "react";
 import { useLms } from "@/lib/lms-store";
+import { useAuth } from "@/components/AuthGate";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { dark, toggleDark } = useLms();
+  const { sair } = useAuth();
   const link = "rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground";
   const active = { className: "rounded-md px-3 py-2 text-sm font-medium bg-secondary text-foreground" };
   return (
@@ -23,6 +25,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </nav>
           <button onClick={toggleDark} aria-label="Alternar tema" className="ml-auto rounded-md border p-2 hover:bg-secondary">
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+          <button onClick={sair} aria-label="Sair" className="flex items-center gap-1 rounded-md border px-3 py-2 text-sm hover:bg-secondary">
+            <LogOut className="h-4 w-4" /> Sair
           </button>
         </div>
       </header>
