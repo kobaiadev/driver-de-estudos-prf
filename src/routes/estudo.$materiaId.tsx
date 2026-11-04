@@ -43,7 +43,7 @@ function Estudo() {
 
   return (
     <AppShell>
-      <div className="mx-auto grid max-w-[1400px] gap-4 px-4 py-6 lg:grid-cols-[280px_1fr_280px]">
+      <div className="mx-auto grid max-w-[1400px] grid-cols-[minmax(0,1fr)] gap-4 px-3 py-6 sm:px-4 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)_280px]">
         <aside className="rounded-lg border bg-sidebar p-3 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-auto">
           <select value={materiaId} onChange={(e) => (window.location.href = `/estudo/${e.target.value}`)}
             className="mb-3 w-full rounded-md border bg-card px-2 py-1.5 text-sm font-semibold">
@@ -119,7 +119,7 @@ function Estudo() {
           <Link to="/" className="inline-block text-sm text-muted-foreground hover:text-foreground">← Voltar ao painel</Link>
         </section>
 
-        <aside className="lg:sticky lg:top-20 lg:self-start"><Pomodoro materiaId={materia.id} nome={materia.nome} /></aside>
+        <aside className="lg:col-span-2 xl:col-span-1 xl:sticky xl:top-20 xl:self-start"><Pomodoro materiaId={materia.id} nome={materia.nome} /></aside>
       </div>
     </AppShell>
   );

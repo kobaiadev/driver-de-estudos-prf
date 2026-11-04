@@ -62,7 +62,7 @@ function Importar() {
   const btn = "inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold disabled:opacity-60";
   return (
     <AppShell>
-      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 lg:grid-cols-[380px_1fr]">
+      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)] gap-6 px-3 py-8 sm:px-4 lg:grid-cols-[340px_minmax(0,1fr)] xl:grid-cols-[380px_minmax(0,1fr)]">
         <section className="rounded-lg border bg-card p-5">
           <div className="flex items-center gap-2"><HardDrive className="h-5 w-5 text-primary" /><h2 className="font-bold">Repositório do Google Drive</h2></div>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -101,7 +101,7 @@ function Importar() {
                     {sem.map((x) => {
                       const ok = concluidas.includes(x.aulaId);
                       return (
-                        <li key={x.aulaId} className="flex items-start gap-2 text-sm">
+                        <li key={x.aulaId} className="flex min-w-0 items-start gap-2 break-words text-sm">
                           <input type="checkbox" checked={ok} onChange={() => toggleAula(x.aulaId)} className="mt-1 accent-[var(--primary)]" aria-label={`Concluir ${x.aula}`} />
                           <Link to="/estudo/$materiaId" params={{ materiaId: x.materiaId }} search={{ aula: x.aulaId }} className={`hover:text-primary ${ok ? "line-through opacity-60" : ""}`}>
                             <span className="font-semibold">{x.materia}:</span> <span className="text-muted-foreground">{x.aula}</span>

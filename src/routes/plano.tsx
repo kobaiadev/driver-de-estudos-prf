@@ -57,7 +57,7 @@ function Plano() {
       <section className="bg-hero text-primary-foreground dark:text-foreground">
         <div className="mx-auto max-w-7xl px-4 py-10">
           <p className="text-sm font-semibold uppercase tracking-widest text-accent">Plano de estudos PRF</p>
-          <h1 className="mt-2 text-4xl font-black">Seu ciclo semanal</h1>
+          <h1 className="mt-2 text-3xl font-black sm:text-4xl">Seu ciclo semanal</h1>
           <label className="mt-6 flex max-w-md flex-col gap-2 text-sm">
             Horas de estudo por semana: <span className="font-display text-2xl font-black">{horasSemana}h</span>
             <input type="range" min={6} max={60} step={1} value={horasSemana} onChange={(e) => setHorasSemana(Number(e.target.value))} className="accent-[var(--accent)]" />
