@@ -70,9 +70,9 @@ function Estudo() {
         </aside>
 
         <section className="order-1 space-y-4 lg:order-2">
-          <div className="aspect-video overflow-hidden rounded-lg border bg-muted">
+          <div className="-mx-3 aspect-[4/3] overflow-hidden border-y bg-muted sm:mx-0 sm:aspect-video sm:rounded-lg sm:border">
             {video ? (
-              <iframe key={video.id} src={video.url} title={video.titulo} className="h-full w-full" allow="autoplay" allowFullScreen />
+              <iframe key={video.id} src={video.url} title={video.titulo} className="block h-full w-full border-0" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen />
             ) : (
               <div className="grid h-full place-items-center p-6 text-center text-sm text-muted-foreground">
                 Esta aula não tem vídeo — estude pelos PDFs abaixo.
