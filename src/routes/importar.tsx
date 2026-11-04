@@ -6,7 +6,7 @@ import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { gerarTrilha, MATERIAS } from "@/lib/lms-data";
 import { useLms } from "@/lib/lms-store";
-import { listarDrive, type DriveItem } from "@/lib/drive.functions";
+import { listarDrive, type DriveItem, PASTA_RAIZ } from "@/lib/drive.functions";
 
 export const Route = createFileRoute("/importar")({
   head: () => ({
@@ -72,7 +72,7 @@ function Importar() {
             <RefreshCw className={`h-4 w-4 ${loading === "sync" ? "animate-spin" : ""}`} /> Sincronizar pastas
           </button>
           <div className="mt-4 max-h-[60vh] overflow-auto rounded border p-2">
-            <DriveFolder pastaId="root" />
+            <DriveFolder pastaId={PASTA_RAIZ} />
           </div>
         </section>
         <section>

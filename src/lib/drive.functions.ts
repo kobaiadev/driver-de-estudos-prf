@@ -1,12 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 
-export type DriveItem = { id: string; nome: string; pasta: boolean; mimeType: string; link?: string; tamanho?: string };
+export const PASTA_RAIZ = "1yDimyasj-FZb6EbJwXNQNW1XLChRR8Si";
+
+export type DriveItem = { id: string; nome: string; pasta: boolean; mimeType: string; link?: string | undefined; tamanho?: string | undefined };
 
 export const listarDrive = createServerFn({ method: "GET" })
-  .inputValidator((d: { pastaId?: string }) => ({ pastaId: /^[\w-]{1,200}$/.test(d?.pastaId ?? "") ? d.pastaId! : "root" }))
+  .inputValidator((d: { pastaId?: string }) => ({ pastaId: /^[\w-]{1,200}$/.test(d?.pastaId ?? "") ? d.pastaId! : PASTA_RAIZ }))
   .handler(async ({ data }): Promise<{ itens: DriveItem[]; erro?: string }> => {
-    const lk = process.env.LOVABLE_API_KEY;
-    const dk = process.env.GOOGLE_DRIVE_API_KEY;
+    const lk = process.env['LOVABLE_API_KEY'];
+    const dk = process.env['GOOGLE_DRIVE_API_KEY'];
     if (!lk || !dk) return { itens: [], erro: "Google Drive não configurado" };
     const q = `'${data.pastaId}' in parents and trashed=false`;
     const url = new URL("https://connector-gateway.lovable.dev/google_drive/drive/v3/files");
