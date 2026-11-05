@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-export const PASTA_RAIZ = "1yDimyasj-FZb6EbJwXNQNW1XLChRR8Si";
+export const PASTA_RAIZ = "1-QJd_YEOvsQMOB7OGRBMRzsd2XtNmnla";
 
 export type DriveItem = { id: string; nome: string; pasta: boolean; mimeType: string; link?: string | undefined; tamanho?: string | undefined };
 

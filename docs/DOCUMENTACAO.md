@@ -88,7 +88,7 @@ type Materia = {
 
 Dois mecanismos distintos:
 
-1. **Navegação ao vivo** (`/importar`): a função de servidor `listarDrive(pastaId?)` chama o connector gateway e lista o conteúdo de uma pasta em tempo real. A pasta raiz padrão é `1yDimyasj-FZb6EbJwXNQNW1XLChRR8Si` (constante `PASTA_RAIZ` em `drive.functions.ts`). O botão "Sincronizar pastas" invalida o cache do React Query e busca de novo.
+1. **Navegação ao vivo** (`/importar`): a função de servidor `listarDrive(pastaId?)` chama o connector gateway e lista o conteúdo de uma pasta em tempo real. A pasta raiz padrão é `1-QJd_YEOvsQMOB7OGRBMRzsd2XtNmnla` (constante `PASTA_RAIZ` em `drive.functions.ts`). O botão "Sincronizar pastas" invalida o cache do React Query e busca de novo.
 2. **Catálogo estático** (matérias/aulas/trilha): gerado offline a partir do Drive e versionado no repositório. Garante que o app funcione mesmo sem as chaves de ambiente.
 
 Variáveis de ambiente necessárias (ver `.env.example`):
