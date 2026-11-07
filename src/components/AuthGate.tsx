@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type FormEvent, type ReactNode } from "react";
-import { Lock, Shield, User } from "lucide-react";
+import { Lock, User } from "lucide-react";
 import { entrar } from "@/lib/auth.functions";
 
 const KEY = "prf-auth";
@@ -40,8 +40,8 @@ function Login({ onOk }: { onOk: () => void }) {
     <div className="grid min-h-screen place-items-center bg-hero px-4">
       <form onSubmit={submit} className="w-full max-w-sm rounded-xl border bg-card p-8 shadow-xl">
         <div className="mb-6 flex flex-col items-center gap-3 text-center">
-          <span className="grid h-12 w-12 place-items-center rounded-lg bg-primary text-primary-foreground"><Shield className="h-6 w-6" /></span>
-          <h1 className="font-display text-2xl font-black">Rumo<span className="text-accent dark:text-primary">PRF</span></h1>
+          <img src="/ct-lago-logo.jpg" alt="CT Lago Concursos" className="h-20 w-20 rounded-full border-2 border-accent object-cover" />
+          <h1 className="font-display text-2xl font-black">CT Lago <span className="text-primary">Concursos</span></h1>
           <p className="text-sm text-muted-foreground">Acesso restrito. Entre com seu usuário e senha.</p>
         </div>
         <label className="mb-1 block text-sm font-medium" htmlFor="usuario">Usuário</label>

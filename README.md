@@ -1,10 +1,11 @@
-# RumoPRF — Plataforma de Estudos para o Concurso da PRF
+# CT Lago Concursos — Plataforma de Estudos para Carreiras Policiais
 
-Aplicação web completa para organizar os estudos do concurso da Polícia Rodoviária Federal, conectada ao Google Drive do usuário: as videoaulas e PDFs reais da pasta de estudos viram matérias, cursos e aulas navegáveis, com trilha semanal, plano de estudos baseado em técnicas comprovadas e registro de progresso.
+Plataforma de estudos do CT Lago Concursos para organizar a preparação para carreiras policiais, com acesso às pastas do Google Drive, matérias e materiais por concurso. A área da PRF também inclui catálogo de aulas, trilha semanal, plano de estudos e acompanhamento de progresso.
 
 ## Funcionalidades
 
-- **Painel** (`/`) — visão geral: horas de estudo, simulados, % do edital concluído, aulas concluídas e cartões por matéria agrupados em frentes (Direito, Trânsito, Exatas, Linguagens, Mentorias).
+- **Seja bem-vindo** (`/`) — orientações de uso, acesso rápido aos concursos e painel de progresso da PRF.
+- **Concursos** (`/concursos/:concursoId`) — pastas e materiais da Polícia Rodoviária Federal (RF), Polícia Legislativa da Câmara dos Deputados e Polícia Legislativa do TRT.
 - **Drive & Trilha** (`/importar`) — navegação real pela pasta do Google Drive (pastas abrem ao clicar, arquivos abrem no Drive) e a **Trilha de Estudos**: todas as 700+ aulas do Drive distribuídas em semanas, intercalando cursos, mentorias, Passo Estratégico, bizus e simulados. Cada item da trilha abre a aula exata na tela Estudar.
 - **Estudar** (`/estudo/:materiaId`) — tela de estudo com lista de módulos/aulas, vídeos reproduzidos direto do Drive (com abas quando a aula tem vários vídeos), links para PDFs e Passo Estratégico, botão "Marcar Aula como Concluída" e cronômetro Pomodoro (25/5) que soma tempo de foco à matéria.
 - **Plano de Estudos** (`/plano`) — plano baseado em técnicas com evidência científica (prática de recuperação, revisão espaçada, intercalação, Pomodoro, questões estilo Cebraspe): divisor de horas semanais, distribuição por matéria conforme o peso no edital, ciclo de estudos e lista de **revisões pendentes** (24h, 7 dias e 30 dias após cada aula concluída).
@@ -25,17 +26,20 @@ Aplicação web completa para organizar os estudos do concurso da Polícia Rodov
 src/
 ├── routes/
 │   ├── __root.tsx            # Layout raiz (provedores, fontes, SEO)
-│   ├── index.tsx             # Painel (dashboard)
+│   ├── index.tsx             # Boas-vindas e painel do aluno
+│   ├── concursos.$concursoId.tsx # Materiais por concurso
 │   ├── importar.tsx          # Drive real + Trilha de estudos
 │   ├── estudo.$materiaId.tsx # Tela de estudo (vídeo, PDFs, Pomodoro)
 │   └── plano.tsx             # Plano de estudos e revisões
 ├── components/
-│   ├── AppShell.tsx          # Cabeçalho e navegação
+│   ├── AppShell.tsx          # Identidade visual e navegação lateral
+│   ├── DriveBrowser.tsx      # Navegação compartilhada das pastas do Drive
 │   └── ui/                   # Componentes shadcn
 ├── lib/
 │   ├── lms-data.ts           # Matérias, frentes e geração da trilha
 │   ├── drive-catalogo.json   # Catálogo gerado a partir do Drive (snapshot)
 │   ├── drive.functions.ts    # Função de servidor que lista pastas do Drive
+│   ├── concursos.ts          # Concursos e pastas do Google Drive
 │   ├── lms-store.tsx         # Estado global + persistência (localStorage)
 │   ├── plano.ts              # Pesos das matérias e distribuição de horas
 │   └── plano.test.ts         # Testes do plano

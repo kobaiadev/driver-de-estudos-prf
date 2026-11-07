@@ -80,8 +80,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "RumoPRF — Estudos para a PRF" },
-      { name: "description", content: "Plataforma de estudos para concursos com foco na PRF." },
+      { title: "CT Lago Concursos — Preparação para carreiras policiais" },
+      { name: "description", content: "Plataforma de estudos do CT Lago Concursos para carreiras policiais." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },

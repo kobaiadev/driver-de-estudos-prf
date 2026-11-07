@@ -9,9 +9,9 @@ import { APOIO, distribuirHoras, PESOS } from "@/lib/plano";
 export const Route = createFileRoute("/plano")({
   head: () => ({
     meta: [
-      { title: "Plano de Estudos PRF — RumoPRF" },
+      { title: "Plano de Estudos PRF — CT Lago Concursos" },
       { name: "description", content: "Plano semanal por matéria com ciclo de estudos, revisões espaçadas e técnicas comprovadas." },
-      { property: "og:title", content: "Plano de Estudos PRF — RumoPRF" },
+      { property: "og:title", content: "Plano de Estudos PRF — CT Lago Concursos" },
       { property: "og:description", content: "Ciclo de estudos, revisões 24h/7d/30d e prática de questões." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -55,18 +55,18 @@ function Plano() {
   return (
     <AppShell>
       <section className="bg-hero text-primary-foreground dark:text-foreground">
-        <div className="mx-auto max-w-7xl px-4 py-10">
-          <p className="text-sm font-semibold uppercase tracking-widest text-accent">Plano de estudos PRF</p>
-          <h1 className="mt-2 text-3xl font-black sm:text-4xl">Seu ciclo semanal</h1>
-          <label className="mt-6 flex max-w-md flex-col gap-2 text-sm">
-            Horas de estudo por semana: <span className="font-display text-2xl font-black">{horasSemana}h</span>
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10">
+          <p className="text-xs font-semibold uppercase tracking-widest text-accent sm:text-sm">Plano de estudos PRF</p>
+          <h1 className="mt-2 text-2xl font-black sm:text-4xl">Seu ciclo semanal</h1>
+          <label className="mt-5 flex max-w-md flex-col gap-2 text-sm sm:mt-6">
+            <span>Horas de estudo por semana: <strong className="font-display text-xl font-black sm:text-2xl">{horasSemana}h</strong></span>
             <input type="range" min={6} max={60} step={1} value={horasSemana} onChange={(e) => setHorasSemana(Number(e.target.value))} className="accent-[var(--accent)]" />
           </label>
         </div>
       </section>
-      <div className="mx-auto max-w-7xl space-y-8 px-4 py-8">
+      <div className="mx-auto max-w-7xl space-y-6 px-3 py-5 sm:space-y-8 sm:px-6 sm:py-8">
         <section>
-          <h2 className="mb-3 text-xl font-bold">Técnicas que funcionam</h2>
+          <h2 className="mb-3 text-lg font-bold sm:text-xl">Técnicas que funcionam</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {TECNICAS.map((t) => (
               <div key={t.t} className="rounded-lg border bg-card p-4">
@@ -78,7 +78,7 @@ function Plano() {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-2">
-          <div className="rounded-lg border bg-card p-4">
+          <div className="min-w-0 rounded-lg border bg-card p-3 sm:p-4">
             <h2 className="font-bold">Divisão da semana</h2>
             <p className="mb-3 text-xs text-muted-foreground">70% teoria · {questoes}h de questões e simulados · {revisao}h de revisão</p>
             <ul className="space-y-2">
@@ -87,7 +87,7 @@ function Plano() {
                 const feitas = ids.filter((x) => concluidas.includes(x)).length;
                 return (
                   <li key={id} className="text-sm">
-                    <Link to="/estudo/$materiaId" params={{ materiaId: id }} className="flex justify-between gap-2 hover:text-primary">
+                    <Link to="/estudo/$materiaId" params={{ materiaId: id }} className="flex flex-col gap-0.5 hover:text-primary sm:flex-row sm:justify-between sm:gap-2">
                       <span className="font-semibold">{nome(id)} <span className="text-xs font-normal text-muted-foreground">{"★".repeat(peso)}</span></span>
                       <span className="text-muted-foreground">{porMateria[id]}h/sem · {feitas}/{ids.length} aulas</span>
                     </Link>
@@ -96,7 +96,7 @@ function Plano() {
               })}
               {APOIO.map((id) => (
                 <li key={id} className="text-sm">
-                  <Link to="/estudo/$materiaId" params={{ materiaId: id }} className="flex justify-between hover:text-primary">
+                  <Link to="/estudo/$materiaId" params={{ materiaId: id }} className="flex flex-col gap-0.5 hover:text-primary sm:flex-row sm:justify-between">
                     <span className="font-semibold">{nome(id)}</span><span className="text-muted-foreground">nas horas de questões/revisão</span>
                   </Link>
                 </li>
@@ -104,7 +104,7 @@ function Plano() {
             </ul>
           </div>
           <div className="space-y-6">
-            <div className="rounded-lg border bg-card p-4">
+            <div className="min-w-0 rounded-lg border bg-card p-3 sm:p-4">
               <h2 className="font-bold">Ciclo de estudos (blocos de ~1h)</h2>
               <p className="mb-3 text-xs text-muted-foreground">Siga na ordem; quando terminar, recomece do início. Não importa o dia da semana.</p>
               <ol className="flex flex-wrap gap-2">

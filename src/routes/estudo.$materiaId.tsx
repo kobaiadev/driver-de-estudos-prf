@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { CheckCircle2, ChevronDown, Circle, ExternalLink, FileText, PlayCircle, Pause, Play, RotateCcw, Target } from "lucide-react";
+import { CheckCircle2, ChevronDown, Circle, ExternalLink, FileText, Maximize2, Minimize2, PlayCircle, Pause, Play, RotateCcw, Target, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { MATERIAS, todasAulas } from "@/lib/lms-data";
@@ -14,9 +14,9 @@ export const Route = createFileRoute("/estudo/$materiaId")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.nome ?? "Estudo"} — RumoPRF` },
+      { title: `${loaderData?.nome ?? "Estudo"} — CT Lago Concursos` },
       { name: "description", content: `Aulas, PDFs e Passo Estratégico de ${loaderData?.nome ?? "estudo"} para a PRF.` },
-      { property: "og:title", content: `${loaderData?.nome ?? "Estudo"} — RumoPRF` },
+      { property: "og:title", content: `${loaderData?.nome ?? "Estudo"} — CT Lago Concursos` },
       { property: "og:description", content: "Estude com vídeo, materiais e Pomodoro integrado." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -37,14 +37,48 @@ function Estudo() {
   const aula = aulas.find((a) => a.id === aulaId) ?? aulas[0]!;
   const [abertos, setAbertos] = useState<string[]>([(materia.modulos.find((mo) => mo.aulas.some((x) => x.id === inicial)) ?? materia.modulos[0]!).id]);
   const [vidIdx, setVidIdx] = useState(0);
-  useEffect(() => setVidIdx(0), [aulaId]);
+  const [videoEmTelaCheia, setVideoEmTelaCheia] = useState(false);
+  const playerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    setVidIdx(0);
+    setVideoEmTelaCheia(false);
+  }, [aulaId]);
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) setVideoEmTelaCheia(false);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+  useEffect(() => {
+    if (!videoEmTelaCheia) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !document.fullscreenElement) setVideoEmTelaCheia(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [videoEmTelaCheia]);
+  const selecionarVideo = (index: number) => {
+    setVidIdx(index);
+    setVideoEmTelaCheia(true);
+    const player = playerRef.current;
+    if (player?.requestFullscreen && document.fullscreenElement !== player) {
+      void player.requestFullscreen().catch(() => setVideoEmTelaCheia(true));
+    }
+  };
+  const fecharVideo = () => {
+    setVideoEmTelaCheia(false);
+    if (document.fullscreenElement) {
+      void document.exitFullscreen().catch((error: unknown) => console.error("Não foi possível fechar a tela cheia.", error));
+    }
+  };
   const video = aula.videos[vidIdx] ?? aula.videos[0];
   const feita = concluidas.includes(aula.id);
 
   return (
     <AppShell>
-      <div className="mx-auto grid max-w-[1400px] grid-cols-[minmax(0,1fr)] gap-4 px-3 py-6 sm:px-4 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)_280px]">
-        <aside className="order-2 rounded-lg border bg-sidebar p-3 lg:order-1 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-auto">
+      <div className="mx-auto grid max-w-[1400px] grid-cols-[minmax(0,1fr)] gap-3 px-3 py-4 sm:gap-4 sm:px-4 sm:py-6 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)_280px]">
+        <aside className="order-2 max-h-[55vh] overflow-auto rounded-lg border bg-sidebar p-3 lg:order-1 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)]">
           <select value={materiaId} onChange={(e) => (window.location.href = `/estudo/${e.target.value}`)}
             className="mb-3 w-full rounded-md border bg-card px-2 py-1.5 text-sm font-semibold">
             {MATERIAS.map((m) => <option key={m.id} value={m.id}>{m.nome}</option>)}
@@ -70,33 +104,60 @@ function Estudo() {
         </aside>
 
         <section className="order-1 space-y-4 lg:order-2">
-          <div className="-mx-3 aspect-[4/3] overflow-hidden border-y bg-muted sm:mx-0 sm:aspect-video sm:rounded-lg sm:border">
-            {video ? (
-              <iframe key={video.id} src={video.url} title={video.titulo} className="block h-full w-full border-0" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen />
-            ) : (
-              <div className="grid h-full place-items-center p-6 text-center text-sm text-muted-foreground">
-                Esta aula não tem vídeo — estude pelos PDFs abaixo.
+          <div
+            ref={playerRef}
+            className={videoEmTelaCheia
+              ? "fixed inset-0 z-[100] flex flex-col gap-3 overflow-y-auto bg-background p-3 sm:p-5"
+              : "space-y-4"}
+          >
+            {videoEmTelaCheia && (
+              <div className="flex min-h-11 items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">Reproduzindo vídeo</p>
+                  <p className="truncate text-sm font-semibold sm:text-base">{video?.titulo ?? aula.titulo}</p>
+                </div>
+                <button type="button" onClick={fecharVideo} className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg border px-3 text-sm font-semibold hover:bg-secondary" aria-label="Fechar tela cheia">
+                  <X className="h-4 w-4 sm:hidden" /><Minimize2 className="hidden h-4 w-4 sm:block" />
+                  <span className="hidden sm:inline">Sair da tela cheia</span>
+                </button>
               </div>
             )}
-          </div>
-          {aula.videos.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {aula.videos.map((v, i) => (
-                <button key={v.id} onClick={() => setVidIdx(i)}
-                  className={`inline-flex max-w-full items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs ${i === vidIdx ? "border-primary bg-primary text-primary-foreground" : "bg-card hover:border-primary"}`}>
-                  <PlayCircle className="h-3.5 w-3.5 shrink-0" /><span className="truncate">{v.titulo}</span>
-                </button>
-              ))}
-              {video && <a href={video.abrir} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 px-2 py-1.5 text-xs text-muted-foreground hover:text-primary">Abrir no Drive <ExternalLink className="h-3 w-3" /></a>}
+            <div className={videoEmTelaCheia
+              ? "min-h-0 flex-1 overflow-hidden rounded-lg border bg-muted"
+              : "-mx-3 aspect-video overflow-hidden border-y bg-muted sm:mx-0 sm:rounded-lg sm:border"}
+            >
+              {video ? (
+                <iframe key={video.id} src={video.url} title={video.titulo} className="block h-full w-full border-0" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen />
+              ) : (
+                <div className="grid h-full place-items-center p-6 text-center text-sm text-muted-foreground">
+                  Esta aula não tem vídeo — estude pelos PDFs abaixo.
+                </div>
+              )}
             </div>
-          )}
+            {aula.videos.length > 0 && (
+              <div className={`flex flex-wrap gap-2 ${videoEmTelaCheia ? "max-h-24 shrink-0 overflow-y-auto" : ""}`}>
+                {aula.videos.map((v, i) => (
+                  <button key={v.id} onClick={() => selecionarVideo(i)}
+                    className={`inline-flex max-w-full items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs ${i === vidIdx ? "border-primary bg-primary text-primary-foreground" : "bg-card hover:border-primary"}`}>
+                    <PlayCircle className="h-3.5 w-3.5 shrink-0" /><span className="truncate">{v.titulo}</span>
+                  </button>
+                ))}
+                {video && <a href={video.abrir} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center gap-1 px-2 py-1.5 text-xs text-muted-foreground hover:text-primary">Abrir no Drive <ExternalLink className="h-3 w-3" /></a>}
+              </div>
+            )}
+            {!videoEmTelaCheia && video && (
+              <button type="button" onClick={() => selecionarVideo(vidIdx)} className="inline-flex min-h-10 items-center gap-2 rounded-md border px-3 text-sm font-semibold hover:bg-secondary">
+                <Maximize2 className="h-4 w-4" />Abrir vídeo em tela cheia
+              </button>
+            )}
+          </div>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-xs uppercase tracking-wider text-muted-foreground">{materia.modulos.find((mo) => mo.aulas.some((x) => x.id === aula.id))?.titulo}</p>
-              <h1 className="text-2xl font-black">{aula.titulo}</h1>
+              <h1 className="break-words text-xl font-black leading-tight sm:text-2xl">{aula.titulo}</h1>
             </div>
             <button onClick={() => toggleAula(aula.id)}
-              className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold ${feita ? "bg-success text-primary-foreground" : "bg-primary text-primary-foreground"}`}>
+              className={`inline-flex w-full items-center justify-center gap-2 rounded-md px-3 py-2.5 text-center text-xs font-semibold sm:w-auto sm:px-4 sm:text-sm ${feita ? "bg-success text-primary-foreground" : "bg-primary text-primary-foreground"}`}>
               {feita ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
               {feita ? "Aula concluída" : "Marcar Aula como Concluída"}
             </button>

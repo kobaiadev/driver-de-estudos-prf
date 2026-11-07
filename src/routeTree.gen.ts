@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ImportarRouteImport } from './routes/importar'
 import { Route as PlanoRouteImport } from './routes/plano'
+import { Route as ConcursosConcursoIdRouteImport } from './routes/concursos.$concursoId'
 import { Route as EstudoMateriaIdRouteImport } from './routes/estudo.$materiaId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const PlanoRoute = PlanoRouteImport.update({
   path: '/plano',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConcursosConcursoIdRoute = ConcursosConcursoIdRouteImport.update({
+  id: '/concursos/$concursoId',
+  path: '/concursos/$concursoId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EstudoMateriaIdRoute = EstudoMateriaIdRouteImport.update({
   id: '/estudo/$materiaId',
   path: '/estudo/$materiaId',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/importar': typeof ImportarRoute
   '/plano': typeof PlanoRoute
+  '/concursos/$concursoId': typeof ConcursosConcursoIdRoute
   '/estudo/$materiaId': typeof EstudoMateriaIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/importar': typeof ImportarRoute
   '/plano': typeof PlanoRoute
+  '/concursos/$concursoId': typeof ConcursosConcursoIdRoute
   '/estudo/$materiaId': typeof EstudoMateriaIdRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,38 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/importar': typeof ImportarRoute
   '/plano': typeof PlanoRoute
+  '/concursos/$concursoId': typeof ConcursosConcursoIdRoute
   '/estudo/$materiaId': typeof EstudoMateriaIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/importar' | '/plano' | '/estudo/$materiaId'
+  fullPaths:
+    | '/'
+    | '/importar'
+    | '/plano'
+    | '/concursos/$concursoId'
+    | '/estudo/$materiaId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/importar' | '/plano' | '/estudo/$materiaId'
-  id: '__root__' | '/' | '/importar' | '/plano' | '/estudo/$materiaId'
+  to:
+    | '/'
+    | '/importar'
+    | '/plano'
+    | '/concursos/$concursoId'
+    | '/estudo/$materiaId'
+  id:
+    | '__root__'
+    | '/'
+    | '/importar'
+    | '/plano'
+    | '/concursos/$concursoId'
+    | '/estudo/$materiaId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ImportarRoute: typeof ImportarRoute
   PlanoRoute: typeof PlanoRoute
+  ConcursosConcursoIdRoute: typeof ConcursosConcursoIdRoute
   EstudoMateriaIdRoute: typeof EstudoMateriaIdRoute
 }
 
@@ -92,6 +118,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlanoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/concursos/$concursoId': {
+      id: '/concursos/$concursoId'
+      path: '/concursos/$concursoId'
+      fullPath: '/concursos/$concursoId'
+      preLoaderRoute: typeof ConcursosConcursoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/estudo/$materiaId': {
       id: '/estudo/$materiaId'
       path: '/estudo/$materiaId'
@@ -106,6 +139,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ImportarRoute: ImportarRoute,
   PlanoRoute: PlanoRoute,
+  ConcursosConcursoIdRoute: ConcursosConcursoIdRoute,
   EstudoMateriaIdRoute: EstudoMateriaIdRoute,
 }
 export const routeTree = rootRouteImport

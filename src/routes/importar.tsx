@@ -1,19 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { ChevronDown, ChevronRight, FileText, Folder, HardDrive, RefreshCw, Sparkles } from "lucide-react";
+import { ChevronDown, HardDrive, RefreshCw, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { DriveBrowser } from "@/components/DriveBrowser";
 import { gerarTrilha, MATERIAS, todasAulas } from "@/lib/lms-data";
 import { useLms } from "@/lib/lms-store";
-import { listarDrive, type DriveItem, PASTA_RAIZ } from "@/lib/drive.functions";
+import { PASTA_RAIZ } from "@/lib/drive.functions";
 
 export const Route = createFileRoute("/importar")({
   head: () => ({
     meta: [
-      { title: "Importar do Google Drive — RumoPRF" },
+      { title: "Trilha PRF — CT Lago Concursos" },
       { name: "description", content: "Sincronize as pastas do Drive e gere sua trilha semanal de estudos." },
-      { property: "og:title", content: "Importar do Google Drive — RumoPRF" },
+      { property: "og:title", content: "Trilha PRF — CT Lago Concursos" },
       { property: "og:description", content: "Gere uma trilha de estudos automática a partir das suas pastas." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -21,38 +21,6 @@ export const Route = createFileRoute("/importar")({
   }),
   component: Importar,
 });
-
-function DriveFolder({ pastaId, depth = 0 }: { pastaId: string; depth?: number }) {
-  const listar = useServerFn(listarDrive);
-  const { data, isLoading } = useQuery({ queryKey: ["drive", pastaId], queryFn: () => listar({ data: { pastaId } }) });
-  const pad = depth * 16 + 8;
-  if (isLoading) return <div className="px-2 py-1 text-xs text-muted-foreground" style={{ paddingLeft: pad }}>Carregando…</div>;
-  if (data?.erro) return <div className="px-2 py-1 text-xs text-destructive" style={{ paddingLeft: pad }}>{data.erro}</div>;
-  if (!data?.itens.length) return <div className="px-2 py-1 text-xs text-muted-foreground" style={{ paddingLeft: pad }}>Pasta vazia</div>;
-  return <>{data.itens.map((it) => <DriveRow key={it.id} it={it} depth={depth} />)}</>;
-}
-
-function DriveRow({ it, depth }: { it: DriveItem; depth: number }) {
-  const [open, setOpen] = useState(false);
-  const cls = "flex w-full items-center gap-1.5 rounded px-2 py-1 text-left text-sm hover:bg-secondary";
-  const style = { paddingLeft: depth * 16 + 8 };
-  if (!it.pasta) {
-    return (
-      <a href={it.link} target="_blank" rel="noreferrer" className={cls} style={style}>
-        <span className="w-3.5" /><FileText className="h-4 w-4 shrink-0 text-muted-foreground" /><span className="truncate">{it.nome}</span>
-      </a>
-    );
-  }
-  return (
-    <div>
-      <button onClick={() => setOpen(!open)} className={cls} style={style}>
-        <ChevronRight className={`h-3.5 w-3.5 shrink-0 transition ${open ? "rotate-90" : ""}`} />
-        <Folder className="h-4 w-4 shrink-0 text-accent" /><span className="truncate">{it.nome}</span>
-      </button>
-      {open && <DriveFolder pastaId={it.id} depth={depth + 1} />}
-    </div>
-  );
-}
 
 function Importar() {
   const { trilha, setTrilha, sincronizadoEm, sincronizar, concluidas, toggleAula } = useLms();
@@ -62,27 +30,27 @@ function Importar() {
   const btn = "inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold disabled:opacity-60";
   return (
     <AppShell>
-      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)] gap-6 px-3 py-8 sm:px-4 lg:grid-cols-[340px_minmax(0,1fr)] xl:grid-cols-[380px_minmax(0,1fr)]">
-        <section className="rounded-lg border bg-card p-5">
+      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)] gap-4 px-3 py-5 sm:gap-6 sm:px-4 sm:py-8 lg:grid-cols-[340px_minmax(0,1fr)] xl:grid-cols-[380px_minmax(0,1fr)]">
+        <section className="min-w-0 rounded-lg border bg-card p-3 sm:p-5">
           <div className="flex items-center gap-2"><HardDrive className="h-5 w-5 text-primary" /><h2 className="font-bold">Repositório do Google Drive</h2></div>
           <p className="mt-1 text-xs text-muted-foreground">
             Google Drive conectado · {sincronizadoEm ? `sincronizado em ${new Date(sincronizadoEm).toLocaleString("pt-BR")}` : "não sincronizado"}
           </p>
-          <button disabled={!!loading} onClick={() => run("sync", () => { sincronizar(); qc.invalidateQueries({ queryKey: ["drive"] }); })} className={`${btn} mt-4 border hover:bg-secondary`}>
+          <button disabled={!!loading} onClick={() => run("sync", () => { sincronizar(); qc.invalidateQueries({ queryKey: ["drive"] }); })} className={`${btn} mt-4 w-full justify-center border text-center hover:bg-secondary sm:w-auto`}>
             <RefreshCw className={`h-4 w-4 ${loading === "sync" ? "animate-spin" : ""}`} /> Sincronizar pastas
           </button>
           <div className="mt-4 max-h-[60vh] overflow-auto rounded border p-2">
-            <DriveFolder pastaId={PASTA_RAIZ} />
+            <DriveBrowser pastaId={PASTA_RAIZ} />
           </div>
         </section>
-        <section>
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        <section className="min-w-0">
+          <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
             <div>
-              <h1 className="text-2xl font-black">Trilha de estudos semanal</h1>
+              <h1 className="text-xl font-black sm:text-2xl">Trilha de estudos semanal</h1>
               <p className="text-sm text-muted-foreground">{MATERIAS.length} matérias · {trilha?.reduce((n, s) => n + s.length, 0) ?? 0} aulas (todas as pastas do Drive, incluindo mentorias, Passo Estratégico, bizus e simulados) · {trilha?.length ?? 0} semanas</p>
             </div>
-            <button disabled={!!loading} onClick={() => run("gen", () => setTrilha(gerarTrilha(MATERIAS)))} className={`${btn} bg-accent text-accent-foreground hover:opacity-90`}>
-              <Sparkles className="h-4 w-4" /> {loading === "gen" ? "Gerando..." : "Gerar Trilha de Estudos Automatizada"}
+            <button disabled={!!loading} onClick={() => run("gen", () => setTrilha(gerarTrilha(MATERIAS)))} className={`${btn} w-full justify-center bg-accent text-center text-xs text-accent-foreground hover:opacity-90 sm:w-auto sm:text-sm`}>
+              <Sparkles className="h-4 w-4 shrink-0" /> {loading === "gen" ? "Gerando..." : "Gerar trilha de estudos"}
             </button>
           </div>
           <ProgressoTrilha />
